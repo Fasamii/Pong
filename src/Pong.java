@@ -5,8 +5,9 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Random;
-
 import javax.swing.Timer;
+import java.awt.Font;
+
 public class Pong {
 
     static int SCREEN_WIDTH = 600;
@@ -50,6 +51,7 @@ class Game_logic implements Runnable{
 
     private Random rand = new Random();
 
+    byte win = 0;
     boolean[] pressed_keys = new boolean[4];
 
     Game_logic(int SCREEN_WIDTH, int SCREEN_HEIGHT) {
@@ -109,8 +111,8 @@ class Game_logic implements Runnable{
         this.ball_x += this.ball_move_x; this.ball_y += this.ball_move_y;
         if(this.ball_y < 0 || this.ball_y > Pong.SCREEN_HEIGHT - 50){this.ball_move_y -= (ball_move_y * 2);}
         //win and lose system
-        if(ball_x < -5){System.out.println("blue win"); gamerun = false;}
-        if(ball_x > Pong.SCREEN_WIDTH - 20){System.out.println("red win"); gamerun = false;}
+        if(ball_x < -5){gamerun = false; win = 1;}
+        if(ball_x > Pong.SCREEN_WIDTH - 20){gamerun = false; win = 2;}
         //platform bouncing
         if(ball_x < 25){
             if(ball_y > platform_pos_A && ball_y < platform_pos_A + 90 && ball_move_x < 0){ball_move_x -= (ball_move_x * 2); ball_move_y = rand.nextDouble(2)-1;}
@@ -159,6 +161,18 @@ class Game_gui extends JLabel {
         g.drawRect(WIDTH - 30, logic.getPlatformBpos(), 20, 90);
         g.setColor(COLORS[4]);
         g.drawOval(logic.getBallPos()[0], logic.getBallPos()[1], 20, 20);
+
+        Font font = new Font(null, Font.PLAIN, 24);
+        g.setFont(font);
+        g.setColor(COLORS[4]);
+
+        if(logic.win == 1){
+        g.drawString("blue win", 40, 50);
+        }
+        
+        if(logic.win == 2){
+        g.drawString("red win", 40, 50);
+        }
     }
 
 }
