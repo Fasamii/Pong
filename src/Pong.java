@@ -15,14 +15,17 @@ public class Pong {
         new Color(0x0000E0),
         new Color(0xAA2AAA)
     };
+    
+    static JFrame f;
 
     public static void main(String[] args) {
         
-        JFrame f = new JFrame();
+        f = new JFrame();
         f.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.add(new Game_gui(new Game_logic(SCREEN_WIDTH, SCREEN_HEIGHT), COLORS, SCREEN_WIDTH)); 
         f.setVisible(true);
+        f.add(new Game_gui(new Game_logic(SCREEN_WIDTH, SCREEN_HEIGHT), COLORS, SCREEN_WIDTH)); 
+        f.repaint();
     }
 }
 
@@ -35,6 +38,8 @@ class Game_logic {
 
     private int platform_pos_A;
     private int platform_pos_B;
+
+    int temp_x; int temp_y;
 
     Game_logic(int SCREEN_WIDTH, int SCREEN_HEIGHT) {
         this.ball_x = SCREEN_WIDTH / 2; this.ball_y = SCREEN_HEIGHT / 2;
@@ -51,6 +56,13 @@ class Game_logic {
     int[] getBallPos(){
         int[] temp = {this.ball_x, this.ball_y};
         return temp;
+    }
+
+    void move(){
+        if(this.ball_x == this.ball_last_x && this.ball_y == this.ball_last_y){this.ball_last_x -= 10; this.ball_last_y -= 10;}
+        else {temp_x = ball_x; temp_y = ball_y; ball_x = ball_x - ball_last_x; ball_y = ball_y - ball_last_y; ball_last_x = temp_x; ball_last_y = temp_y;}
+
+        System.out.println("x - "+ball_x+" / y - "+ball_y+" || l_x - "+ball_last_x+" / l_y - "+ball_last_y);
     }
 }
 
