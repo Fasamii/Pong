@@ -2,12 +2,16 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.Random;
+
 import javax.swing.Timer;
 public class Pong {
 
     static int SCREEN_WIDTH = 600;
     static int SCREEN_HEIGHT = 500;
-    static int DELAY = 100;
+    static int DELAY = 4;
     static Color[] COLORS = {
         new Color(0x001020),
         new Color(0xDDDDDD),
@@ -23,32 +27,63 @@ public class Pong {
         f = new JFrame();
         f.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Game_logic logic_runner = new Game_logic(SCREEN_WIDTH, SCREEN_HEIGHT);
+        Thread logicThread = new Thread(logic_runner);
+        Game_gui gui = new Game_gui(logic_runner, COLORS, SCREEN_WIDTH);
+        logicThread.start(); 
+        f.add(gui);
         f.setVisible(true);
-        Game_logic logic_runneer = new Game_logic(SCREEN_WIDTH, SCREEN_HEIGHT);
-        Thread logic = new Thread(logic_runneer);
-        Game_gui gui = new Game_gui(logic_runneer, COLORS, SCREEN_WIDTH);
-        logic.start();
-        f.add(gui); 
-        f.repaint();
     }
 }
 
 class Game_logic implements Runnable{
 
-    private int ball_x;
-    private int ball_y;
-    private int ball_last_x;
-    private int ball_last_y;
+    private double ball_x;
+    private double ball_y;
+    private double ball_move_x;
+    private double ball_move_y;
 
     private int platform_pos_A;
     private int platform_pos_B;
 
-    int temp_x; int temp_y;
+    private Random rand = new Random();
+
+    boolean[] pressed_keys = new boolean[4];
 
     Game_logic(int SCREEN_WIDTH, int SCREEN_HEIGHT) {
         this.ball_x = SCREEN_WIDTH / 2; this.ball_y = SCREEN_HEIGHT / 2;
-        this.ball_last_x = this.ball_x; this.ball_last_y = this.ball_y;
+        this.ball_move_x = 0.9; this.ball_move_y = 0.8;
         this.platform_pos_A = SCREEN_HEIGHT / 2; this.platform_pos_B = SCREEN_HEIGHT / 2;
+        Pong.f.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                switch (e.getKeyCode()) {
+                    case 87:pressed_keys[0] = true;break;
+                    case 83:pressed_keys[1] = true;break;
+                    case 38:pressed_keys[2] = true;break;
+                    case 40:pressed_keys[3] = true;break;
+                    default:break;
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                switch (e.getKeyCode()) {
+                    case 87:pressed_keys[0] = false;break;
+                    case 83:pressed_keys[1] = false;break;
+                    case 38:pressed_keys[2] = false;break;
+                    case 40:pressed_keys[3] = false;break;
+                    default:break;
+                }
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+               
+            }
+            
+        });
     }
 
     int getPlatformApos(){
@@ -58,22 +93,39 @@ class Game_logic implements Runnable{
         return this.platform_pos_B;
     }
     int[] getBallPos(){
-        int[] temp = {this.ball_x, this.ball_y};
-        return temp;
+        return new int[]{(int) this.ball_x, (int) this.ball_y};
     }
 
     void move(){
-        if(this.ball_x == this.ball_last_x && this.ball_y == this.ball_last_y){this.ball_last_x -= 10; this.ball_last_y -= 10;}
-        else {temp_x = ball_x; temp_y = ball_y; ball_x = ball_x - ball_last_x; ball_y = ball_y - ball_last_y; ball_last_x = temp_x; ball_last_y = temp_y;}
-
-        System.out.println("x - "+ball_x+" / y - "+ball_y+" || l_x - "+ball_last_x+" / l_y - "+ball_last_y);
+        //platforms
+        if(pressed_keys[0] == true && platform_pos_A > 7){platform_pos_A -= 1;}
+        if(pressed_keys[1] == true && platform_pos_A < Pong.SCREEN_HEIGHT - 128){platform_pos_A += 1;}
+        if(pressed_keys[2] == true && platform_pos_B > 7){platform_pos_B -= 1;}
+        if(pressed_keys[3] == true && platform_pos_B < Pong.SCREEN_HEIGHT - 128){platform_pos_B += 1;}
+        //ball
+        this.ball_x += this.ball_move_x; this.ball_y += this.ball_move_y;
+        if(this.ball_y < 0 || this.ball_y > Pong.SCREEN_HEIGHT - 50){this.ball_move_y -= (ball_move_y * 2);}
+        //win and lose system
+        
+        //platform bouncing
+        if(ball_x < 25){
+            if(ball_y > platform_pos_A && ball_y < platform_pos_A + 90){ball_move_x -= (ball_move_x * 2); ball_move_y = rand.nextDouble(2)-1;}
+        }
+        if(ball_x > Pong.SCREEN_WIDTH - 50){
+            if(ball_y > platform_pos_B && ball_y < platform_pos_B + 90){ball_move_x -= (ball_move_x * 2); ball_move_y = rand.nextDouble(2)-1;}
+        }
     }
 
     @Override
     public void run() {
-        move();
-        move();
-        move();
+        while (true){
+            try {
+                Thread.sleep(Pong.DELAY);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            move();
+        }
     }
 }
 
@@ -88,7 +140,7 @@ class Game_gui extends JLabel {
         this.WIDTH = WIDTH;
         this.setOpaque(true);
         this.setBackground(COLORS[0]);
-        Timer timer = new Timer(Pong.DELAY, e -> repaint());
+        Timer timer = new Timer(1, e -> repaint());
         timer.start();
     }
 
