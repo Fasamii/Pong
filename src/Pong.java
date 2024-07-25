@@ -12,13 +12,13 @@ public class Pong {
 
     static int SCREEN_WIDTH = 1000;
     static int SCREEN_HEIGHT = 700;
-    static int DELAY = 3;
+    static int DELAY = 2;
     static Color[] COLORS = {
         new Color(0x001020),
         new Color(0xDDDDDD),
         new Color(0xE00000),
         new Color(0x0000E0),
-        new Color(0xAA2AAA)
+        new Color(0xBA2ABA)
     };
     
     static JFrame f;
@@ -57,7 +57,7 @@ class Game_logic implements Runnable{
 
     Game_logic(int SCREEN_WIDTH, int SCREEN_HEIGHT) {
         this.ball_x = SCREEN_WIDTH / 2; this.ball_y = SCREEN_HEIGHT / 2;
-        this.ball_move_x = rand.nextDouble(0.5)+0.4; this.ball_move_y = rand.nextDouble(0.5)+0.8;
+        this.ball_move_x = 0.70; this.ball_move_y = rand.nextDouble(0.5) * 2;
         this.platform_pos_A = SCREEN_HEIGHT / 2; this.platform_pos_B = SCREEN_HEIGHT / 2;
         Pong.f.addKeyListener(new KeyListener() {
 
