@@ -38,6 +38,8 @@ public class Pong {
 
 class Game_logic implements Runnable{
 
+    public boolean gamerun = false;
+
     private double ball_x;
     private double ball_y;
     private double ball_move_x;
@@ -58,6 +60,7 @@ class Game_logic implements Runnable{
 
             @Override
             public void keyPressed(KeyEvent e) {
+                gamerun = true;
                 switch (e.getKeyCode()) {
                     case 87:pressed_keys[0] = true;break;
                     case 83:pressed_keys[1] = true;break;
@@ -96,7 +99,7 @@ class Game_logic implements Runnable{
         return new int[]{(int) this.ball_x, (int) this.ball_y};
     }
 
-    void move(){
+                void move(){
         //platforms
         if(pressed_keys[0] == true && platform_pos_A > 7){platform_pos_A -= 1;}
         if(pressed_keys[1] == true && platform_pos_A < Pong.SCREEN_HEIGHT - 128){platform_pos_A += 1;}
@@ -106,13 +109,14 @@ class Game_logic implements Runnable{
         this.ball_x += this.ball_move_x; this.ball_y += this.ball_move_y;
         if(this.ball_y < 0 || this.ball_y > Pong.SCREEN_HEIGHT - 50){this.ball_move_y -= (ball_move_y * 2);}
         //win and lose system
-        
+        if(ball_x < -5){System.out.println("blue win"); gamerun = false;}
+        if(ball_x > Pong.SCREEN_WIDTH - 20){System.out.println("red win"); gamerun = false;}
         //platform bouncing
         if(ball_x < 25){
-            if(ball_y > platform_pos_A && ball_y < platform_pos_A + 90){ball_move_x -= (ball_move_x * 2); ball_move_y = rand.nextDouble(2)-1;}
+            if(ball_y > platform_pos_A && ball_y < platform_pos_A + 90 && ball_move_x < 0){ball_move_x -= (ball_move_x * 2); ball_move_y = rand.nextDouble(2)-1;}
         }
         if(ball_x > Pong.SCREEN_WIDTH - 50){
-            if(ball_y > platform_pos_B && ball_y < platform_pos_B + 90){ball_move_x -= (ball_move_x * 2); ball_move_y = rand.nextDouble(2)-1;}
+            if(ball_y > platform_pos_B && ball_y < platform_pos_B + 90 && ball_move_x > 0){ball_move_x -= (ball_move_x * 2); ball_move_y = rand.nextDouble(2)-1;}
         }
     }
 
@@ -124,7 +128,7 @@ class Game_logic implements Runnable{
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            move();
+            if(gamerun){move();}
         }
     }
 }
