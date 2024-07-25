@@ -10,9 +10,9 @@ import java.awt.Font;
 
 public class Pong {
 
-    static int SCREEN_WIDTH = 600;
-    static int SCREEN_HEIGHT = 500;
-    static int DELAY = 4;
+    static int SCREEN_WIDTH = 1000;
+    static int SCREEN_HEIGHT = 700;
+    static int DELAY = 3;
     static Color[] COLORS = {
         new Color(0x001020),
         new Color(0xDDDDDD),
@@ -32,6 +32,7 @@ public class Pong {
         Thread logicThread = new Thread(logic_runner);
         Game_gui gui = new Game_gui(logic_runner, COLORS, SCREEN_WIDTH);
         logicThread.start(); 
+        f.setLocationRelativeTo(null);
         f.add(gui);
         f.setVisible(true);
     }
@@ -56,7 +57,7 @@ class Game_logic implements Runnable{
 
     Game_logic(int SCREEN_WIDTH, int SCREEN_HEIGHT) {
         this.ball_x = SCREEN_WIDTH / 2; this.ball_y = SCREEN_HEIGHT / 2;
-        this.ball_move_x = 0.9; this.ball_move_y = 0.8;
+        this.ball_move_x = rand.nextDouble(0.5)+0.4; this.ball_move_y = rand.nextDouble(0.5)+0.8;
         this.platform_pos_A = SCREEN_HEIGHT / 2; this.platform_pos_B = SCREEN_HEIGHT / 2;
         Pong.f.addKeyListener(new KeyListener() {
 
@@ -103,9 +104,9 @@ class Game_logic implements Runnable{
 
                 void move(){
         //platforms
-        if(pressed_keys[0] == true && platform_pos_A > 7){platform_pos_A -= 1;}
+        if(pressed_keys[0] == true && platform_pos_A > 7){platform_pos_A -= 2;}
         if(pressed_keys[1] == true && platform_pos_A < Pong.SCREEN_HEIGHT - 128){platform_pos_A += 1;}
-        if(pressed_keys[2] == true && platform_pos_B > 7){platform_pos_B -= 1;}
+        if(pressed_keys[2] == true && platform_pos_B > 7){platform_pos_B -= 2;}
         if(pressed_keys[3] == true && platform_pos_B < Pong.SCREEN_HEIGHT - 128){platform_pos_B += 1;}
         //ball
         this.ball_x += this.ball_move_x; this.ball_y += this.ball_move_y;
